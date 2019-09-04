@@ -1,0 +1,1 @@
+[![Build Status](https://travis-ci.com/philiplourandos/backbase.svg)](https://travis-ci.com/philiplourandos/backbase)
