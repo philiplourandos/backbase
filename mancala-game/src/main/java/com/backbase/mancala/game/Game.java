@@ -45,6 +45,8 @@ public class Game {
         
         if (startingPitIndex % 7 == 0) {
             LOG.error("Cannot take stones from house");
+        } else if (startingPitIndex > INDEX_PLAYER_2_HOUSE) {
+            LOG.error("Invalid position on board selected: [{}]", startingPitIndex);
         } else {
             final Pit selected = (Pit) board.get(startingPitIndex);
 
@@ -74,10 +76,18 @@ public class Game {
         return turnPlayed;
     }
 
-    protected List<GameAction> getAffectedBoardElements(final int startingPitIndex, final int stonesToDeposit) {
+    /**
+     * We need to get a list of the board elements where we will deposit stones in
+     * 
+     * @param startingPitIndex Starting pit that stones were removed from
+     * @param stonesToDeposit Number of stones in the pit we started on
+     * 
+     * @return List of board elements returned
+     */
+    List<GameAction> getAffectedBoardElements(final int startingPitIndex, final int stonesToDeposit) {
         boolean elementsNotAssembled = true;
 
-        int index = startingPitIndex;
+        int index = startingPitIndex + 1;
 
         final List<GameAction> requiredBoardElements = new ArrayList<>(stonesToDeposit);
 
