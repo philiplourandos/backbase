@@ -8,9 +8,11 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 public class GameTest {
+    private static final int DEFAULT_STONES = 6;
+    
     @Test
     public void when_invalidPositionGiven_thenDoNotPlayTurn() {
-        final Game mancala = new Game(1);
+        final Game mancala = new Game(1, DEFAULT_STONES);
         boolean turnPlayed = mancala.playTurn(1000);
 
         assertFalse(turnPlayed);
@@ -19,7 +21,7 @@ public class GameTest {
     @ParameterizedTest
     @ValueSource(ints = {7, 14})
     public void when_houseUsedAsStartingPoint_thenDoNotPlayTurn(final int houseIndex) {
-        final Game mancala = new Game(2);
+        final Game mancala = new Game(2, DEFAULT_STONES);
         boolean turnPlayed = mancala.playTurn(houseIndex);
 
         assertFalse(turnPlayed);
