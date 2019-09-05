@@ -5,6 +5,10 @@ import com.backbase.mancala.game.GameAction;
 public class Pit implements GameAction {
     private int stones;
 
+    public Pit(final int stones) {
+        this.stones = stones;
+    }
+    
     @Override
     public void addStone() {
         stones++;
