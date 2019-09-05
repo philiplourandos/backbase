@@ -20,16 +20,24 @@ public class Game {
 
     private final Map<Integer, Object> board;
 
-    public Game(final int id) {
+    /**
+     * Constructor
+     * 
+     * @param id Id of this game
+     * @param initialStonesPerPit Default starting stones for each pit
+     */
+    public Game(final int id, final int initialStonesPerPit) {
         this.id = id;
 
         currentPlayer = Players.PLAYER_1;
 
-        this.board = Map.ofEntries(Map.entry(1, new Pit()),
-            Map.entry(2, new Pit()), Map.entry(3, new Pit()), Map.entry(4, new Pit()),
-            Map.entry(5, new Pit()), Map.entry(6, new Pit()), Map.entry(INDEX_PLAYER_1_HOUSE, new House(Players.PLAYER_1)),
-            Map.entry(8, new Pit()), Map.entry(9, new Pit()), Map.entry(10, new Pit()), 
-            Map.entry(11, new Pit()), Map.entry(12, new Pit()), Map.entry(13, new Pit()), 
+        this.board = Map.ofEntries(Map.entry(1, new Pit(initialStonesPerPit)),
+            Map.entry(2, new Pit(initialStonesPerPit)), Map.entry(3, new Pit(initialStonesPerPit)), 
+            Map.entry(4, new Pit(initialStonesPerPit)), Map.entry(5, new Pit(initialStonesPerPit)), 
+            Map.entry(6, new Pit(initialStonesPerPit)), Map.entry(INDEX_PLAYER_1_HOUSE, new House(Players.PLAYER_1)),
+            Map.entry(8, new Pit(initialStonesPerPit)), Map.entry(9, new Pit(initialStonesPerPit)), 
+            Map.entry(10, new Pit(initialStonesPerPit)), Map.entry(11, new Pit(initialStonesPerPit)), 
+            Map.entry(12, new Pit(initialStonesPerPit)), Map.entry(13, new Pit(initialStonesPerPit)), 
             Map.entry(INDEX_PLAYER_2_HOUSE, new House(Players.PLAYER_2)));
     }
     
