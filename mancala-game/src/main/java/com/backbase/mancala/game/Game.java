@@ -3,23 +3,38 @@ package com.backbase.mancala.game;
 import com.backbase.mancala.game.board.House;
 import com.backbase.mancala.game.board.Pit;
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
+import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class Game {
     private static final Logger LOG = LogManager.getLogger(Game.class);
-
+    
+    private static final int TOTAL_BOARD_ELEMENTS_PER_PLAYER = 7;
     private static final int INDEX_PLAYER_1_HOUSE = 7;
     private static final int INDEX_PLAYER_2_HOUSE = 14;
+
+    private static final List<Integer> PLAYER_1_INDEXES = List.of(1, 2, 3, 4, 5, 6);
+    private static final List<Integer> PLAYER_2_INDEXES = List.of(8, 9, 10, 11, 12, 13);
+    private static final Map<Players, Integer> PLAYER_HOUSE_INDEX = new EnumMap<Players, Integer>(Players.class);
+    
+    static {
+        PLAYER_HOUSE_INDEX.put(Players.PLAYER_1, INDEX_PLAYER_1_HOUSE);
+        PLAYER_HOUSE_INDEX.put(Players.PLAYER_2, INDEX_PLAYER_2_HOUSE);
+    }
 
     private final int id;
 
     private Players currentPlayer;
 
-    private final Map<Integer, Object> board;
+    private final Map<Integer, GameAction> board = new TreeMap<>();
 
+    private boolean gameOver;
+    
     /**
      * Constructor
      * 
@@ -31,14 +46,11 @@ public class Game {
 
         currentPlayer = Players.PLAYER_1;
 
-        this.board = Map.ofEntries(Map.entry(1, new Pit(initialStonesPerPit)),
-            Map.entry(2, new Pit(initialStonesPerPit)), Map.entry(3, new Pit(initialStonesPerPit)), 
-            Map.entry(4, new Pit(initialStonesPerPit)), Map.entry(5, new Pit(initialStonesPerPit)), 
-            Map.entry(6, new Pit(initialStonesPerPit)), Map.entry(INDEX_PLAYER_1_HOUSE, new House(Players.PLAYER_1)),
-            Map.entry(8, new Pit(initialStonesPerPit)), Map.entry(9, new Pit(initialStonesPerPit)), 
-            Map.entry(10, new Pit(initialStonesPerPit)), Map.entry(11, new Pit(initialStonesPerPit)), 
-            Map.entry(12, new Pit(initialStonesPerPit)), Map.entry(13, new Pit(initialStonesPerPit)), 
-            Map.entry(INDEX_PLAYER_2_HOUSE, new House(Players.PLAYER_2)));
+        PLAYER_1_INDEXES.stream().forEach(a -> board.put(a, new Pit(initialStonesPerPit, Players.PLAYER_1)));
+        board.put(INDEX_PLAYER_1_HOUSE, new House(Players.PLAYER_1));
+
+        PLAYER_2_INDEXES.stream().forEach(a -> board.put(a, new Pit(initialStonesPerPit, Players.PLAYER_2)));
+        board.put(INDEX_PLAYER_2_HOUSE, new House(Players.PLAYER_2));
     }
     
     /**
@@ -51,7 +63,7 @@ public class Game {
     public boolean playTurn(final int startingPitIndex) {
         boolean turnPlayed = false;
         
-        if (startingPitIndex % 7 == 0) {
+        if (startingPitIndex % TOTAL_BOARD_ELEMENTS_PER_PLAYER == 0) {
             LOG.error("Cannot take stones from house");
         } else if (startingPitIndex > INDEX_PLAYER_2_HOUSE) {
             LOG.error("Invalid position on board selected: [{}]", startingPitIndex);
@@ -70,13 +82,30 @@ public class Game {
                 
                 if (House.class.isAssignableFrom(lastBoardElementUsed.getClass())) {
                     LOG.info("Player: [{}], has another turn", currentPlayer);
-                }
-                if (lastBoardElementUsed.countStones() == 1) {
+                } else {
+                    if (lastBoardElementUsed.countStones() == 1 && lastBoardElementUsed.isOwner(currentPlayer)) {
+                        // start index + 1(when we start sowing stones) + number of stones
+                        int lastElementIndex = startingPitIndex + 1 + pickedUpStones;
+                        int capturedStones = ((Pit) lastBoardElementUsed).removeAll();
+
+                        if (lastElementIndex < INDEX_PLAYER_1_HOUSE) {
+                            lastElementIndex += TOTAL_BOARD_ELEMENTS_PER_PLAYER;
+                        } else {
+                            lastElementIndex -= TOTAL_BOARD_ELEMENTS_PER_PLAYER;
+                        }
+
+                        final Pit oppositePit = (Pit) board.get(lastElementIndex);
+                        capturedStones += oppositePit.removeAll();
+
+                        final House house = (House) board.get(PLAYER_HOUSE_INDEX.get(currentPlayer));
+                        house.addStones(capturedStones);
+                    }
+
                     currentPlayer = currentPlayer.equals(Players.PLAYER_1) ? Players.PLAYER_2 : Players.PLAYER_1;
-                    
-                    LOG.info("Last stone was placed in an empty pit. Next player is: [{}]", currentPlayer);
+
+                    LOG.info("Next player is: [{}]", currentPlayer);
                 }
-                
+
                 turnPlayed = true;
             }
         }
@@ -84,6 +113,27 @@ public class Game {
         return turnPlayed;
     }
 
+    /**
+     * The game is over if the player has no stones in their pit
+     * 
+     * @param player Players pits to inspect
+     * 
+     * @return True returned if player has no more stones in their pit
+     */
+    public boolean hasGameEnded(final Players player) {
+        final long stones = board.entrySet().stream()
+                .map(c -> c.getValue())
+                .filter(p -> Pit.class.isAssignableFrom(p.getClass()))
+                .map(c -> (Pit) c)
+                .filter(p -> p.isOwner(player))
+                .map(c -> c.countStones())
+                .count();
+        
+        LOG.info("Player: [{}], has [{}] stones left", player, stones);
+        
+        return stones == 0;
+    } 
+    
     /**
      * We need to get a list of the board elements where we will deposit stones in
      * 
@@ -131,5 +181,22 @@ public class Game {
     
     public int getId() {
         return id;
+    }
+    
+    public boolean isGameOver() {
+        return gameOver;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder output = new StringBuilder(60);
+        output.append("\n|   Player1   |   Player2   |\n");
+
+        final String boardState = board.entrySet().stream()
+                .map(a -> String.valueOf(a.getValue().countStones()))
+                .collect(Collectors.joining(","));
+        output.append('|').append(boardState).append('|');
+
+        return output.toString();
     }
 }
