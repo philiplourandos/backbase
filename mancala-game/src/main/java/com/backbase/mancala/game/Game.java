@@ -208,7 +208,7 @@ public class Game {
         return output.toString();
     }
 
-    Map<Integer, GameAction> getBoard() {
+    public Map<Integer, GameAction> getBoard() {
         return board;
     }
 }
