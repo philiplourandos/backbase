@@ -6,6 +6,7 @@ public class GamesResponse implements Serializable {
     private Integer id;
     
     private String uri;
+    private String status;
 
     public GamesResponse() {
     }
@@ -24,5 +25,13 @@ public class GamesResponse implements Serializable {
 
     public void setUri(String uri) {
         this.uri = uri;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }
