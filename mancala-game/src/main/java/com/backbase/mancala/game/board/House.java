@@ -22,7 +22,12 @@ public class House implements GameAction {
         return stones;
     }
 
+    @Override
     public boolean isOwner(final Players player) {
         return owner.equals(player);
+    }
+    
+    public void addStones(final int stones) {
+        this.stones += stones;
     }
 }
