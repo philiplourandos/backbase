@@ -70,6 +70,8 @@ public class Game {
             LOG.error("Cannot take stones from house");
         } else if (startingPitIndex > INDEX_PLAYER_2_HOUSE) {
             LOG.error("Invalid position on board selected: [{}]", startingPitIndex);
+        } else if (!isPlayersPit(startingPitIndex)) {
+            LOG.error("Pit selected does not belong to owner: [{}]", currentPlayer);
         } else {
             final Pit selected = (Pit) board.get(startingPitIndex);
 
@@ -116,6 +118,13 @@ public class Game {
         return turnPlayed;
     }
 
+    
+    private boolean isPlayersPit(final int pitIndex) {
+        final GameAction pit = board.get(pitIndex);
+        
+        return pit.isOwner(currentPlayer);
+    }
+    
     /**
      * The game is over if the player has no stones in their pit
      *
