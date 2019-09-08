@@ -22,6 +22,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class GameEndpoint {
     private static final Logger LOG = LogManager.getLogger(GameEndpoint.class);
     
+    private static final String URL_FORMAT = "http://localhost:8080/games/%d";
+    
     private final Map<Integer, Game> games = new HashMap<>();
 
     private final AtomicInteger idGenerator = new AtomicInteger(1);
@@ -37,7 +39,7 @@ public class GameEndpoint {
         games.put(gameId, newGame);
 
         final CreateGameResponse response = 
-                new CreateGameResponse(gameId, URI.create(String.format("http://localhost:8080/games/%d", gameId)).toString());
+                new CreateGameResponse(gameId, URI.create(String.format(URL_FORMAT, gameId)).toString());
         
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -53,7 +55,7 @@ public class GameEndpoint {
             if (turnPlayed) {
                 final MoveResponse response = new MoveResponse();
                 response.setId(gameId);
-                response.setUri(URI.create(String.format("/games/%d", gameId)).toString());
+                response.setUrl(URI.create(String.format(URL_FORMAT, gameId)).toString());
                 
                 final String status = selectedGame.getBoard()
                         .entrySet()
