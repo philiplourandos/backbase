@@ -6,7 +6,9 @@ import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.TreeMap;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -117,22 +119,28 @@ public class Game {
     /**
      * The game is over if the player has no stones in their pit
      *
-     * @param player Players pits to inspect
-     *
      * @return True returned if player has no more stones in their pit
      */
-    public boolean hasGameEnded(final Players player) {
-        final long stones = board.entrySet().stream()
-                .map(c -> c.getValue())
-                .filter(p -> Pit.class.isAssignableFrom(p.getClass()))
-                .map(c -> (Pit) c)
-                .filter(p -> p.isOwner(player))
-                .map(c -> c.countStones())
-                .count();
+    public boolean hasGameEnded() {
+        final Function<Players, Boolean> checkEndGame= (player) -> {
+        
+            final Optional<Integer> stones = board.entrySet().stream()
+                    .map(c -> c.getValue())
+                    .filter(f -> Pit.class.isAssignableFrom(f.getClass()))
+                    .map(c -> (Pit) c)
+                    .filter(f -> f.isOwner(player))
+                    .map(c -> c.countStones())
+                    .reduce(Integer::sum);
 
-        LOG.info("Player: [{}], has [{}] stones left", player, stones);
+            LOG.info("Player: [{}], has [{}] stones left", player, stones);
 
-        return stones == 0;
+            return stones.map(m -> m == 0).orElse(false);
+        };
+        
+        final Boolean player1Complete = checkEndGame.apply(Players.PLAYER_1);
+        final Boolean player2Complete = checkEndGame.apply(Players.PLAYER_2);
+        
+        return player1Complete || player2Complete;
     }
 
     /**
