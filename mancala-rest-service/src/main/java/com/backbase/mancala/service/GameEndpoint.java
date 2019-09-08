@@ -1,7 +1,8 @@
 package com.backbase.mancala.service;
 
 import com.backbase.mancala.game.Game;
-import com.backbase.mancala.service.domain.GamesResponse;
+import com.backbase.mancala.service.domain.CreateGameResponse;
+import com.backbase.mancala.service.domain.MoveResponse;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
@@ -10,6 +11,7 @@ import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,19 +24,22 @@ public class GameEndpoint {
     
     private final Map<Integer, Game> games = new HashMap<>();
 
-    private final AtomicInteger idGenerator = new AtomicInteger();
+    private final AtomicInteger idGenerator = new AtomicInteger(1);
     
     @Value("${com.backbase.mancala.initial.stones}")
     private int defaultStones;
     
-    @RequestMapping(path = "/games", method = RequestMethod.POST, consumes = "application/json")
+    @RequestMapping(path = "/games", method = RequestMethod.POST, produces = "application/json")
     public ResponseEntity createGame() {
         final Integer gameId = idGenerator.getAndIncrement();
 
         final Game newGame = new Game(gameId, defaultStones);
         games.put(gameId, newGame);
 
-        return ResponseEntity.created(URI.create(String.format("/games/%d", gameId))).build();
+        final CreateGameResponse response = 
+                new CreateGameResponse(gameId, URI.create(String.format("http://localhost:8080/games/%d", gameId)).toString());
+        
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
     
     @RequestMapping(path = "/games/{gameId}/pits/{pitId}", method = RequestMethod.PUT)
@@ -46,7 +51,7 @@ public class GameEndpoint {
             final Boolean turnPlayed = selectedGame.playTurn(pitId);
             
             if (turnPlayed) {
-                final GamesResponse response = new GamesResponse();
+                final MoveResponse response = new MoveResponse();
                 response.setId(gameId);
                 response.setUri(URI.create(String.format("/games/%d", gameId)).toString());
                 
