@@ -6,6 +6,7 @@ import com.backbase.mancala.service.domain.MoveResponse;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
@@ -57,11 +58,12 @@ public class GameEndpoint {
                 response.setId(gameId);
                 response.setUrl(URI.create(String.format(URL_FORMAT, gameId)).toString());
                 
-                final String status = selectedGame.getBoard()
+                final Map<Integer, Integer> status = new TreeMap<>();
+
+                selectedGame.getBoard()
                         .entrySet()
                         .stream()
-                        .map(a -> String.format("\"%d\": \"%d\"", a.getKey(), a.getValue().countStones()))
-                        .collect(Collectors.joining(","));
+                        .forEach(a -> status.put(a.getKey(), a.getValue().countStones()));
                 
                 response.setStatus(status);
 

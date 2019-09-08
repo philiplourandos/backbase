@@ -1,12 +1,13 @@
 package com.backbase.mancala.service.domain;
 
 import java.io.Serializable;
+import java.util.Map;
 
 public class MoveResponse implements Serializable {
     private Integer id;
     
     private String url;
-    private String status;
+    private Map<Integer, Integer> status;
 
     public MoveResponse() {
     }
@@ -27,11 +28,11 @@ public class MoveResponse implements Serializable {
         this.url = url;
     }
 
-    public String getStatus() {
+    public Map<Integer, Integer> getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(Map<Integer, Integer> status) {
         this.status = status;
     }
 }
