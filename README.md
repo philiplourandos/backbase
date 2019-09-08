@@ -1,6 +1,5 @@
 [![Build Status](https://travis-ci.com/philiplourandos/backbase.svg)](https://travis-ci.com/philiplourandos/backbase)
 
-
 # Coding challenge
 
 ## The Goal
@@ -96,3 +95,22 @@ Response Body:
 ```
 
 status: json object key-value, where key is the pitId and value is the number of stones in the pit
+
+# Prerequisites
+
+The following tooling is required in order to build the project:
+
+* maven 3.6.2
+* Java 11
+* git
+
+I'd recommend using www.sdkman.io to install maven and the JDK.
+
+# Checkout and build
+
+
+```
+git clone https://github.com/philiplourandos/backbase.git
+cd backbase
+mvn clean verify
+```
