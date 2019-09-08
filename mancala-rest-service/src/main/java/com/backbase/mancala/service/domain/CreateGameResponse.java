@@ -1,10 +1,15 @@
 package com.backbase.mancala.service.domain;
 
-public class CreateGameResponse {
-    private final Integer id;
-    
-    private final String uri;
+import java.io.Serializable;
 
+public class CreateGameResponse implements Serializable {
+    private Integer id;
+    
+    private String uri;
+
+    public CreateGameResponse() {
+    }
+    
     public CreateGameResponse(Integer id, String uri) {
         this.id = id;
         this.uri = uri;
