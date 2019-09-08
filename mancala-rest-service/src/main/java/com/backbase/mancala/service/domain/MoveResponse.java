@@ -2,13 +2,13 @@ package com.backbase.mancala.service.domain;
 
 import java.io.Serializable;
 
-public class GamesResponse implements Serializable {
+public class MoveResponse implements Serializable {
     private Integer id;
     
     private String uri;
     private String status;
 
-    public GamesResponse() {
+    public MoveResponse() {
     }
 
     public Integer getId() {
