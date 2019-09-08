@@ -5,7 +5,7 @@ import java.io.Serializable;
 public class MoveResponse implements Serializable {
     private Integer id;
     
-    private String uri;
+    private String url;
     private String status;
 
     public MoveResponse() {
@@ -19,12 +19,12 @@ public class MoveResponse implements Serializable {
         this.id = id;
     }
 
-    public String getUri() {
-        return uri;
+    public String getUrl() {
+        return url;
     }
 
-    public void setUri(String uri) {
-        this.uri = uri;
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     public String getStatus() {
