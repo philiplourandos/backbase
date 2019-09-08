@@ -1,4 +1,4 @@
-#
+# 
 
 # Running
 
@@ -41,3 +41,5 @@ Documentation from swagger can be access via this URI:
 ```
 http://localhost:8080/swagger-ui.html
 ```
+
+This will list the operations the webservice exposes. The service can also be invoked via this mechanism
