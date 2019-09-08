@@ -3,12 +3,14 @@ package com.backbase.mancala.service;
 import com.backbase.mancala.game.Game;
 import com.backbase.mancala.service.domain.CreateGameResponse;
 import com.backbase.mancala.service.domain.MoveResponse;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,6 +34,8 @@ public class GameEndpoint {
     @Value("${com.backbase.mancala.initial.stones}")
     private int defaultStones;
     
+    @ApiOperation(value = "Create a new game")
+    @ApiResponse(code = 201, message = "New game created")
     @RequestMapping(path = "/games", method = RequestMethod.POST, produces = "application/json")
     public ResponseEntity createGame() {
         final Integer gameId = idGenerator.getAndIncrement();
@@ -45,6 +49,12 @@ public class GameEndpoint {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
     
+    @ApiOperation(value = "Current player allowed to move stones")
+    @ApiResponses(value = {
+        @ApiResponse(code = 404, message = "Game has not been started for supplied id"),
+        @ApiResponse(code = 400, message = "Move not allowed. Pit maybe invalid or not the current players pit"),
+        @ApiResponse(code = 200, message = "Move performed successfully")
+    })
     @RequestMapping(path = "/games/{gameId}/pits/{pitId}", method = RequestMethod.PUT)
     public ResponseEntity move(@PathVariable("gameId") final Integer gameId, 
             @PathVariable("pitId") final Integer pitId) {
