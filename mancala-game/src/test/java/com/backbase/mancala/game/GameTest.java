@@ -76,4 +76,15 @@ public class GameTest {
             assertEquals(Integer.valueOf(values[index]), Integer.valueOf(board.get(index + 1).countStones()));
         }
     }
+    
+    @Test
+    public void when_allPitsEmpty_thenGameOver() {
+        final Game emptyGame = new Game(33, 0);
+        assertTrue(emptyGame.hasGameEnded());
+    }
+    
+    @Test
+    public void when_pitsHaveStones_thenGameNotOver() {
+        assertFalse(successfulGame.isGameOver());
+    }
 }
