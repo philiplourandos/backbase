@@ -66,7 +66,9 @@ public class Game {
     public boolean playTurn(final int startingPitIndex) {
         boolean turnPlayed = false;
 
-        if (startingPitIndex % TOTAL_BOARD_ELEMENTS_PER_PLAYER == 0) {
+        if (gameOver) {
+            LOG.warn("Game has ended");
+        } else if (startingPitIndex % TOTAL_BOARD_ELEMENTS_PER_PLAYER == 0) {
             LOG.error("Cannot take stones from house");
         } else if (startingPitIndex > INDEX_PLAYER_2_HOUSE) {
             LOG.error("Invalid position on board selected: [{}]", startingPitIndex);
@@ -111,6 +113,8 @@ public class Game {
                     LOG.info("Next player is: [{}]", currentPlayer);
                 }
 
+                gameOver = hasGameEnded();
+                
                 turnPlayed = true;
             }
         }
