@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.com/philiplourandos/backbase.svg)](https://travis-ci.com/philiplourandos/backbase)
+[![codecov](https://codecov.io/gh/philiplourandos/backbase/branch/master/graph/badge.svg)](https://codecov.io/gh/philiplourandos/backbase)
 
 # Coding challenge
 
